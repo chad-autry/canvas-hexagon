@@ -1,0 +1,27 @@
+{
+  "name": "canvas-hexagon",
+  "version": "0.0.1",
+  "description": "Encapsulates hexagon dimensions for use with the HTML5 Canvas coordinate system",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chad-autry/canvas-hexagon.git"
+  },
+  "keywords": [
+    "canvas",
+    "hexagon"
+  ],
+  "author": {
+    "name": "Chad Autry",
+    "email": "chad.autry@gmail.com",
+    "url": "http://chad-autry.github.io/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chad-autry/canvas-hexagon/issues"
+  },
+  "homepage": "https://github.com/chad-autry/canvas-hexagon"
+}
