@@ -10,27 +10,30 @@
  *            the math works best to have an odd edgeSize for odd width edges, and even for even
  * @param vScale { number } - The amount to scale by to provide an oblique perspective to the grid, need to calculate here because of twiddle factor
  */
-function hexDefinition(edgeSize, vScale) {
+function HexDefinition(edgeSize, vScale) {
+    //Protect the constructor from being called as a normal method
+    if (!(this instanceof HexDefinition)) {
+        return new HexDefinition(edgeSize, vScale);
+    }
 
     //http://www.gamedev.net/page/resources/_/technical/game-programming/coordinates-in-hexagon-based-tile-maps-r1800
     //and
     //http://www-cs-students.stanford.edu/~amitp/game-programming/grids/
-    
-    this.twiddle = (edgeSize % 2) ? 0.5 : 0; //0 if even, 0.5 if odd
-    this.vScale = vScale;
     this.edgeSize = edgeSize;
+    this.vScale = vScale;
+    this.twiddle = (edgeSize % 2) ? 0.5 : 0; //0 if even, 0.5 if odd
     this.s = edgeSize;
 
-    this.h = Math.sin(30 * Math.PI / 180) * edgeSize; //The height of the triangles, if the hex were composed of a rectangle with triangles on top and bottom
+    this.h = Math.sin(30 * Math.PI / 180) * this.edgeSize; //The height of the triangles, if the hex were composed of a rectangle with triangles on top and bottom
 
-    this.r = Math.cos(30 * Math.PI / 180) * edgeSize; //The width of the triangles, if the two previous triangles were actually composed of mirrored right angle triangles
+    this.r = Math.cos(30 * Math.PI / 180) * this.edgeSize; //The width of the triangles, if the two previous triangles were actually composed of mirrored right angle triangles
     
     /**
      * Important value, will be added/subtracted from a Hex's center pixel co-ordinate to get 2 of the point co-ordinates
      * If edgeWidth is odd, we discount the center pixel (thus the "- this.twiddle" value)
      * The end result must be a whole number, so that the twiddle factor of the central co-ordinate remains when figuring out the point co-ordinates
      */
-    this.hexagon_half_wide_width = Math.round(this.vScale*(edgeSize/2 + this.h));
+    this.hexagon_half_wide_width = Math.round(this.vScale*(this.edgeSize/2 + this.h));
     
     this.hexagon_wide_width = 2 * this.hexagon_half_wide_width; //the vertical width (hex point up), will be used to calculate co-ord conversions. Needs to be accurate to our roundings above
 
@@ -40,74 +43,72 @@ function hexDefinition(edgeSize, vScale) {
     /**
      * This is not a measurement of a single hex. It is the y distance of two adjacent hexes in different y rows when they are oriented horizontal up
      * Used for co-ordinate conversion
-     * Could be calculated as this.edgeSize + this.h, but need it accurate to our other rounded values
+     * Could be calculated as this.edgeSize + h, but need it accurate to our other rounded values
      */
     this.hexagon_narrow_width = this.hexagon_half_wide_width + this.hexagon_scaled_half_edge_size;  //
-
-
-
-    /*
-        Assuming Orientation of u const on the x axis, v constant on the x = -y axis (this will orient the hexes point up)
-    */
-    this.getPixelCoordinates = function(u, v) {
-        //values pre-scaled in the calculation above
-        var y = this.hexagon_narrow_width * u + this.twiddle;
-        
-        //this.hexagon_edge_to_edge_width is a whole, even number. Dividing by 2 gives a whole number
-        var x = this.hexagon_edge_to_edge_width * (u * 0.5 + v) + this.twiddle;
-
-        return { x: x, y: y };
-    };
-
-    /*
-        Assuming Orientation of u const on the x axis, v constant on the x = -y axis (this will orient the hexes point up)
-    */
-    this.getReferencePoint = function(x, y) {
-
-        var u = Math.round(y / this.hexagon_narrow_width);
-        var v = Math.round(x / this.hexagon_edge_to_edge_width - u * 0.5);
-
-        return { u: u, v: v };
-    }
-
-    /**
-     * Convert to Alpha co-ords (all positive, A is up, rotate clockwise)
-     */
-    this.convertToAlpha = function(u, v) {
-        absoluteu = Math.abs(u);
-        absolutev = Math.abs(v);
-        var a =0;
-        var b = 0;
-        var c = 0;
-        var d = 0;
-        var e = 0;
-         var f = 0;
-        if (v < 0) {
-            if (u < 1) {
-                a = absolutev;
-                f = absoluteu
-            } else if (absolutev > absoluteu) {
-                a = absolutev - absoluteu;
-                b = Math.min(absolutev, absoluteu);
-            } else {
-                b = Math.min(absolutev, absoluteu);
-                c = absoluteu - absolutev; 
-            }
-        } else {
-            if (u > -1) {
-                c = absoluteu;
-                d = absolutev;
-            } else if (absolutev > absoluteu) {
-                d = absolutev - absoluteu;
-                e = Math.min(absolutev, absoluteu);
-            } else {
-                e = Math.min(absolutev, absoluteu);
-                f = absoluteu - absolutev; 
-            }
-        }
-        return {a: a, b: b, c: c, d: d, e: e, f: f };
-    }
 }
+
+/*
+Assuming Orientation of u const on the x axis, v constant on the x = -y axis (this will orient the hexes point up)
+*/
+HexDefinition.prototype.getPixelCoordinates = function(u, v) {
+    //values pre-scaled in the calculation above
+    var y = this.hexagon_narrow_width * u + this.twiddle;
+
+    //hexagon_edge_to_edge_width is a whole, even number. Dividing by 2 gives a whole number
+    var x = this.hexagon_edge_to_edge_width * (u * 0.5 + v) + this.twiddle;
+
+    return { x: x, y: y };
+};
+
+
+/**
+ * Assuming Orientation of u const on the x axis, v constant on the x = -y axis (this will orient the hexes point up)
+ */
+HexDefinition.prototype.getReferencePoint = function(x, y) {
+    var u = Math.round(y / this.hexagon_narrow_width);
+    var v = Math.round(x / this.hexagon_edge_to_edge_width - u * 0.5);
+    return { u: u, v: v };
+};
+
+/**
+ * Convert to Alpha co-ords (all positive, A is up, rotate clockwise)
+ * This will eventually be moved to a more general hex utility and not this specfic x, y <--> u, v utility
+ */
+HexDefinition.prototype.convertToAlpha = function(u, v) {
+    var absoluteu = Math.abs(u);
+    var absolutev = Math.abs(v);
+    var a =0;
+    var b = 0;
+    var c = 0;
+    var d = 0;
+    var e = 0;
+    var f = 0;
+    if (v < 0) {
+        if (u < 1) {
+            a = absolutev;
+            f = absoluteu;
+        } else if (absolutev > absoluteu) {
+            a = absolutev - absoluteu;
+            b = Math.min(absolutev, absoluteu);
+        } else {
+            b = Math.min(absolutev, absoluteu);
+            c = absoluteu - absolutev; 
+        }
+    } else {
+        if (u > -1) {
+            c = absoluteu;
+            d = absolutev;
+        } else if (absolutev > absoluteu) {
+            d = absolutev - absoluteu;
+            e = Math.min(absolutev, absoluteu);
+        } else {
+            e = Math.min(absolutev, absoluteu);
+            f = absoluteu - absolutev; 
+        }
+    }
+    return {a: a, b: b, c: c, d: d, e: e, f: f };
+};
 
 /*
 function hexDistance(u1, v1, u2, v2) {
@@ -118,4 +119,4 @@ function hexDistance(u1, v1, u2, v2) {
 }
 */
 
-module.exports = hexDefinition;
+module.exports = HexDefinition;
