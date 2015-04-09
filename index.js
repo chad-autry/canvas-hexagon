@@ -48,9 +48,9 @@ function HexDefinition(edgeSize, vScale) {
     this.hexagon_narrow_width = this.hexagon_half_wide_width + this.hexagon_scaled_half_edge_size;  //
 }
 
-/*
-Assuming Orientation of u const on the x axis, v constant on the x = -y axis (this will orient the hexes point up)
-*/
+/**
+ * Assuming Orientation of u const on the x axis, v constant on the x = -y axis (this will orient the hexes point up)
+ */
 HexDefinition.prototype.getPixelCoordinates = function(u, v) {
     //values pre-scaled in the calculation above
     var y = this.hexagon_narrow_width * u + this.twiddle;

@@ -4,7 +4,12 @@
   "description": "Encapsulates hexagon dimensions for use with the HTML5 Canvas coordinate system",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run jshint && npm run build:specs && npm run karma:single",
+    "karma:single": "karma start karma-conf.js --log-level debug --single-run",
+    "watch:test": "parallelshell \"npm run watch:specs\" \"npm run watch:karma\"",
+    "watch:karma": "karma start karma-conf.js",
+    "build:specs": "browserify index.spec.js --debug -o built.specs.js",
+    "watch:specs": "watchify index.spec.js --debug -o built.specs.js",
     "jshint": "jshint index.js"
   },
   "repository": {
@@ -26,7 +31,15 @@
   },
   "homepage": "https://github.com/chad-autry/canvas-hexagon",
   "devDependencies": {
-    "jshint": "^2.6.3"
+    "browserify": "^9.0.7",
+    "jasmine-core": "^2.2.0",
+    "jshint": "^2.6.3",
+    "karma": "^0.12.31",
+    "karma-cli": "0.0.4",
+    "karma-firefox-launcher": "^0.1.4",
+    "karma-jasmine": "^0.3.5",
+    "parallelshell": "^1.1.1",
+    "watchify": "^3.1.0"
   },
   "jshintConfig": {
     "node": "true"
