@@ -1,28 +1,30 @@
 "use strict";
 /**
- * This is the constructor for a helper class which defines the co-ordinates of a pixilated hexagon
- * Assists in drawing a hexagonal grid, with a consistent look and crisp horizontal/vertical line placement
- * Converts from hexagonal co-ordinates to pixel co-ordinates and back
- * The difficulty this class is intended to encapsulate is that HTML canvas co-ordinates are between pixels. If line width is odd, need to add .5 to draw crisp lines
- * @name hexDefinition
- * @constructs
- * @param edgeSize { integer } - The number of integer pixels in a side. Due to canvas co-ordinates (between pixels)
- *            the math works best to have an odd edgeSize for odd width edges, and even for even
- * @param vScale { number } - The amount to scale by to provide an oblique perspective to the grid, need to calculate here because of twiddle factor
+ * Since only a single constructor is being exported as module.exports this comment isn't documented.
+ * The class and module are the same thing, the contructor comment takes precedence.
+ * @module canvas-hexagon
  */
-function HexDefinition(edgeSize, vScale) {
+ 
+/**
+ * Relates a set of continuous cartesian coordinates to a set of discreet hexagons. Considering +x is right, +y is down (HTML5 canvas) then by default +u is 
+ * is +y and +v is to the bottom right (along the line of x=y). See the [read.me]{@link https://github.com/chad-autry/canvas-hexagon} on github for an explanation with a picture
+ * @constructor
+ * @param edgeSize { integer } - The number of pixels to a side. If odd the cartesian coordinates of the center of hexagons will be +0.5
+ *        This is because HTML5 canvas coordinates lie between pixels. A result of this is even line widths will look sharper with event edgeSizes, 
+ *        and odd lines widths will look sharper with odd edgeSizes
+ * @param vScale { number } - The amount to scale by to provide an oblique perspective to the grid
+ * @param {number} [rotation=0] - The clockwise rotation in radians of the hexagonal coordinates with respect to the cartesian
+ * @example var hexDimensions = new (require(canvas-hexagon))(45, 0.5);
+ */
+ module.exports = function HexDefinition(edgeSize, vScale) {
     //Protect the constructor from being called as a normal method
     if (!(this instanceof HexDefinition)) {
         return new HexDefinition(edgeSize, vScale);
     }
 
-    //http://www.gamedev.net/page/resources/_/technical/game-programming/coordinates-in-hexagon-based-tile-maps-r1800
-    //and
-    //http://www-cs-students.stanford.edu/~amitp/game-programming/grids/
     this.edgeSize = edgeSize;
     this.vScale = vScale;
     this.twiddle = (edgeSize % 2) ? 0.5 : 0; //0 if even, 0.5 if odd
-    this.s = edgeSize;
 
     this.h = Math.sin(30 * Math.PI / 180) * this.edgeSize; //The height of the triangles, if the hex were composed of a rectangle with triangles on top and bottom
 
@@ -32,6 +34,8 @@ function HexDefinition(edgeSize, vScale) {
      * Important value, will be added/subtracted from a Hex's center pixel co-ordinate to get 2 of the point co-ordinates
      * If edgeWidth is odd, we discount the center pixel (thus the "- this.twiddle" value)
      * The end result must be a whole number, so that the twiddle factor of the central co-ordinate remains when figuring out the point co-ordinates
+     *
+     * @type {integer} 
      */
     this.hexagon_half_wide_width = Math.round(this.vScale*(this.edgeSize/2 + this.h));
     
@@ -44,12 +48,25 @@ function HexDefinition(edgeSize, vScale) {
      * This is not a measurement of a single hex. It is the y distance of two adjacent hexes in different y rows when they are oriented horizontal up
      * Used for co-ordinate conversion
      * Could be calculated as this.edgeSize + h, but need it accurate to our other rounded values
+     *
+     * @type {integer} 
      */
     this.hexagon_narrow_width = this.hexagon_half_wide_width + this.hexagon_scaled_half_edge_size;  //
 }
 
 /**
- * Assuming Orientation of u const on the x axis, v constant on the x = -y axis (this will orient the hexes point up)
+ * Cartesian coordinates
+ * @typedef {Object} CartesianCoordinates
+ * @property {number} x - The x coordinate
+ * @property {number} y - The y coordinate
+ */
+
+/**
+ * Calculates the cartesian coordinates coresponding to the the center of a hexagon
+ * @method getPixelCoordinates
+ * @param {integer} u - The u coordinate of the hex
+ * @param {integer} v - The v coordinate of the hex
+ * @returns {module:canvas-hexagon~CartesianCoordinates}
  */
 HexDefinition.prototype.getPixelCoordinates = function(u, v) {
     //values pre-scaled in the calculation above
@@ -61,62 +78,22 @@ HexDefinition.prototype.getPixelCoordinates = function(u, v) {
     return { x: x, y: y };
 };
 
+/**
+ * Coordinates defining a particular hexagon in a hexagonal coordinate system
+ * @typedef {Object} HexagonalCoordinates
+ * @property {integer} u - The u coordinate of a hex
+ * @property {integer} v - The v coordinate of a hex
+ */
 
 /**
- * Assuming Orientation of u const on the x axis, v constant on the x = -y axis (this will orient the hexes point up)
+ * Calculate the hexagonal coordinates corresponding to the given cartesian coordinates
+ * @method getReferencePoint
+ * @param {number} x - The x coordinate
+ * @param {number} y - The y coordinate
+ * @returns {module:canvas-hexagon~HexagonalCoordinates}
  */
 HexDefinition.prototype.getReferencePoint = function(x, y) {
     var u = Math.round(y / this.hexagon_narrow_width);
     var v = Math.round(x / this.hexagon_edge_to_edge_width - u * 0.5);
     return { u: u, v: v };
 };
-
-/**
- * Convert to Alpha co-ords (all positive, A is up, rotate clockwise)
- * This will eventually be moved to a more general hex utility and not this specfic x, y <--> u, v utility
- */
-HexDefinition.prototype.convertToAlpha = function(u, v) {
-    var absoluteu = Math.abs(u);
-    var absolutev = Math.abs(v);
-    var a =0;
-    var b = 0;
-    var c = 0;
-    var d = 0;
-    var e = 0;
-    var f = 0;
-    if (v < 0) {
-        if (u < 1) {
-            a = absolutev;
-            f = absoluteu;
-        } else if (absolutev > absoluteu) {
-            a = absolutev - absoluteu;
-            b = Math.min(absolutev, absoluteu);
-        } else {
-            b = Math.min(absolutev, absoluteu);
-            c = absoluteu - absolutev; 
-        }
-    } else {
-        if (u > -1) {
-            c = absoluteu;
-            d = absolutev;
-        } else if (absolutev > absoluteu) {
-            d = absolutev - absoluteu;
-            e = Math.min(absolutev, absoluteu);
-        } else {
-            e = Math.min(absolutev, absoluteu);
-            f = absoluteu - absolutev; 
-        }
-    }
-    return {a: a, b: b, c: c, d: d, e: e, f: f };
-};
-
-/*
-function hexDistance(u1, v1, u2, v2) {
-    var du = u1 - u2;
-    var dv = v1 - v2;
-    var dd = du + dv;
-    return Math.max(Math.abs(du), Math.abs(dv), Math.abs(dd));
-}
-*/
-
-module.exports = HexDefinition;

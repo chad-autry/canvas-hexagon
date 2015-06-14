@@ -10,7 +10,8 @@
     "watch:karma": "karma start karma-conf.js",
     "build:specs": "browserify index.spec.js --debug -o built.specs.js",
     "watch:specs": "watchify index.spec.js --debug -o built.specs.js",
-    "jshint": "jshint index.js"
+    "jshint": "jshint index.js",
+    "jsdoc": "jsdoc index.js -d ./target/jsdoc"
   },
   "repository": {
     "type": "git",
@@ -33,6 +34,7 @@
   "devDependencies": {
     "browserify": "^9.0.7",
     "jasmine-core": "^2.2.0",
+    "jsdoc": "^3.3.1",
     "jshint": "^2.6.3",
     "karma": "^0.12.31",
     "karma-cli": "0.0.4",
