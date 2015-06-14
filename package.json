@@ -1,7 +1,7 @@
 {
   "name": "cartesian-hexagonal",
   "version": "0.0.2",
-  "description": "Relates discreet hexagonal coordinates to continuous cartesian coordinates, such as for HTML5 canvas",
+  "description": "Relates discrete hexagonal coordinates to continuous cartesian coordinates, such as for HTML5 canvas",
   "main": "index.js",
   "scripts": {
     "test": "npm run jshint && npm run build:specs && npm run karma:single",
