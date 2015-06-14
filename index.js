@@ -2,7 +2,7 @@
 /**
  * Since only a single constructor is being exported as module.exports this comment isn't documented.
  * The class and module are the same thing, the contructor comment takes precedence.
- * @module canvas-hexagon
+ * @module cartesian-hexagonal
  */
  
 /**
@@ -16,19 +16,45 @@
  * @param {number} [rotation=0] - The clockwise rotation in radians of the hexagonal coordinates with respect to the cartesian
  * @example var hexDimensions = new (require(canvas-hexagon))(45, 0.5);
  */
- module.exports = function HexDefinition(edgeSize, vScale) {
+ module.exports = function HexDefinition(edgeSize, vScale, rotation) {
     //Protect the constructor from being called as a normal method
     if (!(this instanceof HexDefinition)) {
         return new HexDefinition(edgeSize, vScale);
     }
 
+    /**
+     * The provided edge size for a hex
+     * @type {integer} 
+     */
     this.edgeSize = edgeSize;
+    
+    /**
+     * The provided vScale
+     * @type {number} 
+     */
     this.vScale = vScale;
+    
+    /**
+     * The twiddle factor used to center hexes on whole numbers (even edgeSize) or in between whole numbers
+     * @private
+     * @type {0 | 0.5}
+     */
     this.twiddle = (edgeSize % 2) ? 0.5 : 0; //0 if even, 0.5 if odd
 
-    this.h = Math.sin(30 * Math.PI / 180) * this.edgeSize; //The height of the triangles, if the hex were composed of a rectangle with triangles on top and bottom
 
-    this.r = Math.cos(30 * Math.PI / 180) * this.edgeSize; //The width of the triangles, if the two previous triangles were actually composed of mirrored right angle triangles
+    /**
+     * The height of the triangles, if the hex were composed of a rectangle with triangles on top and bottom
+     * @private
+     * @type {integer}
+     */
+    this.h = Math.sin(30 * Math.PI / 180) * this.edgeSize; 
+    
+    /**
+     * The width of the triangles, if the two previous triangles were actually composed of mirrored right angle triangles
+     * @private
+     * @type {integer}
+     */
+    this.r = Math.cos(30 * Math.PI / 180) * this.edgeSize;
     
     /**
      * Important value, will be added/subtracted from a Hex's center pixel co-ordinate to get 2 of the point co-ordinates
@@ -52,7 +78,7 @@
      * @type {integer} 
      */
     this.hexagon_narrow_width = this.hexagon_half_wide_width + this.hexagon_scaled_half_edge_size;  //
-}
+};
 
 /**
  * Cartesian coordinates
@@ -68,7 +94,7 @@
  * @param {integer} v - The v coordinate of the hex
  * @returns {module:canvas-hexagon~CartesianCoordinates}
  */
-HexDefinition.prototype.getPixelCoordinates = function(u, v) {
+module.exports.prototype.getPixelCoordinates = function(u, v) {
     //values pre-scaled in the calculation above
     var y = this.hexagon_narrow_width * u + this.twiddle;
 
@@ -92,7 +118,7 @@ HexDefinition.prototype.getPixelCoordinates = function(u, v) {
  * @param {number} y - The y coordinate
  * @returns {module:canvas-hexagon~HexagonalCoordinates}
  */
-HexDefinition.prototype.getReferencePoint = function(x, y) {
+module.exports.prototype.getReferencePoint = function(x, y) {
     var u = Math.round(y / this.hexagon_narrow_width);
     var v = Math.round(x / this.hexagon_edge_to_edge_width - u * 0.5);
     return { u: u, v: v };

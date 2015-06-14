@@ -1,7 +1,7 @@
 {
-  "name": "canvas-hexagon",
+  "name": "cartesian-hexagonal",
   "version": "0.0.2",
-  "description": "Encapsulates hexagon dimensions for use with the HTML5 Canvas coordinate system",
+  "description": "Relates discreet hexagonal coordinates to continuous cartesian coordinates, such as for HTML5 canvas",
   "main": "index.js",
   "scripts": {
     "test": "npm run jshint && npm run build:specs && npm run karma:single",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/chad-autry/canvas-hexagon.git"
+    "url": "https://github.com/chad-autry/cartesian-hexagonal.git"
   },
   "keywords": [
     "canvas",
@@ -28,9 +28,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/chad-autry/canvas-hexagon/issues"
+    "url": "https://github.com/chad-autry/cartesian-hexagonal/issues"
   },
-  "homepage": "https://github.com/chad-autry/canvas-hexagon",
+  "homepage": "https://github.com/chad-autry/cartesian-hexagonal",
   "devDependencies": {
     "browserify": "^9.0.7",
     "jasmine-core": "^2.2.0",
