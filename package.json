@@ -1,6 +1,6 @@
 {
   "name": "cartesian-hexagonal",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Relates discrete hexagonal coordinates to continuous cartesian coordinates, such as for HTML5 canvas",
   "main": "index.js",
   "scripts": {
