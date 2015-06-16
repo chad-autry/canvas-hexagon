@@ -40,3 +40,14 @@ describe( 'HexDefinition:Scaled', function() {
     });
   });
 });
+
+describe( 'HexDefinition:EdgeWidth', function() {
+  describe( 'Edge Wdith 5', function() {
+    var testInstance = new HexDefinition(5, .5, 0, 5);
+
+    it( 'Edgewidth should be accessible when provided', function() {
+      expect( testInstance.edgeWidth ).toEqual(5);
+    });
+    
+  });
+});

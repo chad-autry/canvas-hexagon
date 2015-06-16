@@ -7,16 +7,17 @@
  
 /**
  * Relates a set of continuous cartesian coordinates to a set of discreet hexagons. Considering +x is right, +y is down (HTML5 canvas) then by default +u is 
- * is +y and +v is to the bottom right (along the line of x=y). See the [read.me]{@link https://github.com/chad-autry/canvas-hexagon} on github for an explanation with a picture
+ * is +y and +v is to the bottom right (along the line of x=y). See the [READ.md]{@link https://github.com/chad-autry/canvas-hexagon} on github for an explanation with a picture
  * @constructor
  * @param edgeSize { integer } - The number of pixels to a side. If odd the cartesian coordinates of the center of hexagons will be +0.5
  *        This is because HTML5 canvas coordinates lie between pixels. A result of this is even line widths will look sharper with event edgeSizes, 
  *        and odd lines widths will look sharper with odd edgeSizes
  * @param vScale { number } - The amount to scale by to provide an oblique perspective to the grid
  * @param {number} [rotation=0] - The clockwise rotation in radians of the hexagonal coordinates with respect to the cartesian
+ * @param {integer} [edgeWidth=0] - The edgewidth of the hexagon, convenience for consuming applications, not used internally.
  * @example var hexDimensions = new (require(canvas-hexagon))(45, 0.5);
  */
- module.exports = function HexDefinition(edgeSize, vScale, rotation) {
+ module.exports = function HexDefinition(edgeSize, vScale, rotation, edgeWidth) {
     //Protect the constructor from being called as a normal method
     if (!(this instanceof HexDefinition)) {
         return new HexDefinition(edgeSize, vScale);
@@ -33,6 +34,18 @@
      * @type {number} 
      */
     this.vScale = vScale;
+
+    /**
+     * The provided rotation of the coordinate system
+     * @type {number} 
+     */
+    this.rotation = rotation;
+    
+    /**
+     * The provided edge width for a hex
+     * @type {integer} 
+     */
+    this.edgeWidth = edgeWidth;
     
     /**
      * The twiddle factor used to center hexes on whole numbers (even edgeSize) or in between whole numbers
